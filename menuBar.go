@@ -5,9 +5,8 @@ import (
 	"fyne.io/fyne/v2/dialog"
 )
 
-func getMenuBar(state *AppState) *fyne.MainMenu {
-
-	openItem := fyne.NewMenuItem("Abrir...", func() {
+func getOpenItemFunc(state *AppState) func() {
+	return func() {
 		fileOpenDiag := dialog.NewFileOpen(
 			//callback
 			func(r fyne.URIReadCloser, err error) {
@@ -26,17 +25,23 @@ func getMenuBar(state *AppState) *fyne.MainMenu {
 			state.Window,
 		)
 		fileOpenDiag.Show()
-	})
-	saveItem := fyne.NewMenuItem("Salvar", func() {
+	}
+}
+
+func getSaveItemFunc(state *AppState) func() {
+	return func() {
 		if state.FilePath == "" {
-			printLn("tentando salvar sem filepath")
+			saveAsFunc := getSaveAsItemFunc(state)
+			saveAsFunc()
 			return
 		}
 
 		handleSaveFile(state, state.FilePath)
-	})
+	}
+}
 
-	saveAsItem := fyne.NewMenuItem("Salvar Como", func() {
+func getSaveAsItemFunc(state *AppState) func() {
+	return func() {
 		fileSaveDiag := dialog.NewFileSave(
 			//callback
 			func(w fyne.URIWriteCloser, err error) {
@@ -49,6 +54,7 @@ func getMenuBar(state *AppState) *fyne.MainMenu {
 				}
 
 				uriPath := w.URI().Path()
+				state.FilePath = uriPath
 				handleSaveFile(state, uriPath)
 
 			},
@@ -56,7 +62,14 @@ func getMenuBar(state *AppState) *fyne.MainMenu {
 			state.Window,
 		)
 		fileSaveDiag.Show()
-	})
+	}
+}
+
+func getMenuBar(state *AppState) *fyne.MainMenu {
+
+	openItem := fyne.NewMenuItem("Abrir...", getOpenItemFunc(state))
+	saveItem := fyne.NewMenuItem("Salvar", getSaveItemFunc(state))
+	saveAsItem := fyne.NewMenuItem("Salvar Como", getSaveAsItemFunc(state))
 
 	archiveMenu := fyne.NewMenu("Arquivo", openItem, saveItem, saveAsItem)
 
