@@ -5,6 +5,13 @@ import (
 	"fyne.io/fyne/v2/dialog"
 )
 
+func baseFunc(state *AppState) func() {
+	return func() {
+		dialog.ShowInformation("Example", "Hello, World!", state.Window)
+	}
+}
+
+// Arquivo
 func getOpenItemFunc(state *AppState) func() {
 	return func() {
 		fileOpenDiag := dialog.NewFileOpen(
@@ -67,11 +74,33 @@ func getSaveAsItemFunc(state *AppState) func() {
 
 func getMenuBar(state *AppState) *fyne.MainMenu {
 
+	//Arquivo
+	newItem := fyne.NewMenuItem("Novo", baseFunc(state))
+	newWindowItem := fyne.NewMenuItem("Nova Janela", baseFunc(state))
 	openItem := fyne.NewMenuItem("Abrir...", getOpenItemFunc(state))
 	saveItem := fyne.NewMenuItem("Salvar", getSaveItemFunc(state))
 	saveAsItem := fyne.NewMenuItem("Salvar Como", getSaveAsItemFunc(state))
+	archiveMenu := fyne.NewMenu("Arquivo", newItem, newWindowItem, openItem, saveItem, saveAsItem)
 
-	archiveMenu := fyne.NewMenu("Arquivo", openItem, saveItem, saveAsItem)
+	//Editar
+	blankItem := fyne.NewMenuItem("Nada", baseFunc(state))
+	editMenu := fyne.NewMenu("Editar", blankItem)
 
-	return fyne.NewMainMenu(archiveMenu)
+	//Formatar
+	lineBreakItem := fyne.NewMenuItem("Quebra de Linha Automatica", baseFunc(state))
+	fontItem := fyne.NewMenuItem("Fonte", baseFunc(state))
+	formatMenu := fyne.NewMenu("Formatar", lineBreakItem, fontItem)
+
+	//Exibir
+	zoomItem := fyne.NewMenuItem("Zoom", baseFunc(state))
+	statusBarItem := fyne.NewMenuItem("Barra de Status", baseFunc(state))
+	displayMenu := fyne.NewMenu("Exibir", zoomItem, statusBarItem)
+
+	//Ajuda
+	showHelpItem := fyne.NewMenuItem("Exibir ajuda", baseFunc(state))
+	sendCommentItem := fyne.NewMenuItem("Enviar Comentario", baseFunc(state))
+	aboutItem := fyne.NewMenuItem("Sobre o Bloco de notas", baseFunc(state))
+	helpMenu := fyne.NewMenu("Exibir", showHelpItem, sendCommentItem, fyne.NewMenuItemSeparator(), aboutItem)
+
+	return fyne.NewMainMenu(archiveMenu, editMenu, formatMenu, displayMenu, helpMenu)
 }
