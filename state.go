@@ -71,7 +71,7 @@ func handleSaveFile(state *AppState, path string) error {
 	}
 
 	state.madeChanges = false
-	dialog.ShowInformation("Alerta", "Salvo com sucesso", state.Window)
+	dialog.ShowInformation("", "Salvo com sucesso", state.Window)
 	updateWindowName(state)
 	return nil
 }
