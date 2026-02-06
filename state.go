@@ -15,6 +15,8 @@ type AppState struct {
 
 	FilePath    string
 	madeChanges bool
+
+	MenuBar *fyne.MainMenu
 }
 
 func handleEditorChange(state *AppState) {
@@ -83,9 +85,11 @@ func NewAppState(a fyne.App, w fyne.Window) *AppState {
 		Window: w,
 		Editor: widget.NewMultiLineEntry(),
 
+		MenuBar:     nil,
 		FilePath:    "",
 		madeChanges: false,
 	}
+	state.MenuBar = getMenuBar(state)
 
 	state.Editor.OnChanged = func(s string) {
 		handleEditorChange(state)

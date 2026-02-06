@@ -12,7 +12,7 @@ func main() {
 	state := NewAppState(a, w)
 
 	w.SetContent(state.Editor)
-	w.SetMainMenu(getMenuBar(state))
+	w.SetMainMenu(state.MenuBar)
 	w.Resize(fyne.NewSize(800, 600))
 	w.ShowAndRun()
 }
