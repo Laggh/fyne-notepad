@@ -12,6 +12,31 @@ func baseFunc(state *AppState) func() {
 }
 
 // Arquivo
+// TODO(): Melhorar o sistema de perguntar se pode salvar, e ter 3 botões ao invez de 2
+func getNewItemFunc(state *AppState) func() {
+	return func() {
+		_f := func(b bool) {
+			if b == false {
+				return
+			}
+			state.FilePath = ""
+			state.Editor.SetText("") //muda o madeChanges para true
+			state.madeChanges = false
+			updateWindowName(state)
+		}
+
+		if state.madeChanges {
+			diag := dialog.NewConfirm("notepad",
+				"Você tem mudanças não salvas, deseja salvar",
+				_f, state.Window)
+			diag.Show()
+		} else {
+			_f(true)
+		}
+
+	}
+}
+
 func getOpenItemFunc(state *AppState) func() {
 	return func() {
 		fileOpenDiag := dialog.NewFileOpen(
@@ -75,8 +100,9 @@ func getSaveAsItemFunc(state *AppState) func() {
 func getMenuBar(state *AppState) *fyne.MainMenu {
 
 	//Arquivo
-	newItem := fyne.NewMenuItem("Novo", baseFunc(state))
-	newWindowItem := fyne.NewMenuItem("Nova Janela", baseFunc(state))
+	newItem := fyne.NewMenuItem("Novo", getNewItemFunc(state))
+	//TODO(): fazer janela novo funfar
+	newWindowItem := fyne.NewMenuItem("*Nova Janela", baseFunc(state))
 	openItem := fyne.NewMenuItem("Abrir...", getOpenItemFunc(state))
 	saveItem := fyne.NewMenuItem("Salvar", getSaveItemFunc(state))
 	saveAsItem := fyne.NewMenuItem("Salvar Como", getSaveAsItemFunc(state))
