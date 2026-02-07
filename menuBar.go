@@ -97,9 +97,30 @@ func getSaveAsItemFunc(state *AppState) func() {
 	}
 }
 
+//Editar
+
+// Formatar
+func getLineBreakItemFunc(state *AppState) func() {
+	return func() {
+		lineBreakItem := state.MenuBar.Items[2].Items[0]
+		if state.DoLineBreak {
+			state.DoLineBreak = false
+			lineBreakItem.Checked = false
+			state.Editor.Wrapping = fyne.TextWrapOff
+			state.Editor.Refresh() //atualiza para arrumar a quebra de linha
+		} else {
+			state.DoLineBreak = true
+			lineBreakItem.Checked = true
+			state.Editor.Wrapping = fyne.TextWrapBreak
+			state.Editor.Refresh() //atualiza para arrumar a quebra de linha
+		}
+
+	}
+}
+
 func getMenuBar(state *AppState) *fyne.MainMenu {
 
-	//Arquivo
+	//Arquivo [0]
 	newItem := fyne.NewMenuItem("Novo", getNewItemFunc(state))
 	//TODO(): fazer janela novo funfar
 	newWindowItem := fyne.NewMenuItem("*Nova Janela", baseFunc(state))
@@ -108,21 +129,23 @@ func getMenuBar(state *AppState) *fyne.MainMenu {
 	saveAsItem := fyne.NewMenuItem("Salvar Como", getSaveAsItemFunc(state))
 	archiveMenu := fyne.NewMenu("Arquivo", newItem, newWindowItem, openItem, saveItem, saveAsItem)
 
-	//Editar
+	//Editar [1]
 	blankItem := fyne.NewMenuItem("Nada", baseFunc(state))
 	editMenu := fyne.NewMenu("Editar", blankItem)
 
-	//Formatar
-	lineBreakItem := fyne.NewMenuItem("Quebra de Linha Automatica", baseFunc(state))
+	//Formatar [2]
+	//lineBreakItem := fyne.NewMenuItemWithIcon("Quebra de Linha Automatica", theme.AccountIcon(), getLineBreakItemFunc(state))
+	lineBreakItem := fyne.NewMenuItem("Quebra de Linha Automatica", getLineBreakItemFunc(state))
+	lineBreakItem.Icon = getEmptyIcon()
 	fontItem := fyne.NewMenuItem("Fonte", baseFunc(state))
 	formatMenu := fyne.NewMenu("Formatar", lineBreakItem, fontItem)
 
-	//Exibir
+	//Exibir [3]
 	zoomItem := fyne.NewMenuItem("Zoom", baseFunc(state))
 	statusBarItem := fyne.NewMenuItem("Barra de Status", baseFunc(state))
 	displayMenu := fyne.NewMenu("Exibir", zoomItem, statusBarItem)
 
-	//Ajuda
+	//Ajuda [4]
 	showHelpItem := fyne.NewMenuItem("Exibir ajuda", baseFunc(state))
 	sendCommentItem := fyne.NewMenuItem("Enviar Comentario", baseFunc(state))
 	aboutItem := fyne.NewMenuItem("Sobre o Bloco de notas", baseFunc(state))

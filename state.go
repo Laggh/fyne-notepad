@@ -9,14 +9,16 @@ import (
 )
 
 type AppState struct {
-	App    fyne.App
-	Window fyne.Window
-	Editor *widget.Entry
+	App     fyne.App
+	Window  fyne.Window
+	Editor  *widget.Entry
+	MenuBar *fyne.MainMenu
 
 	FilePath    string
 	madeChanges bool
 
-	MenuBar *fyne.MainMenu
+	DoLineBreak bool
+	TextStyle   *fyne.TextStyle
 }
 
 func handleEditorChange(state *AppState) {
@@ -81,15 +83,20 @@ func handleSaveFile(state *AppState, path string) error {
 func NewAppState(a fyne.App, w fyne.Window) *AppState {
 	//TODO(): Fazer tudo né, tipo durr
 	state := &AppState{
-		App:    a,
-		Window: w,
-		Editor: widget.NewMultiLineEntry(),
+		App:     a,
+		Window:  w,
+		Editor:  widget.NewMultiLineEntry(),
+		MenuBar: nil,
 
-		MenuBar:     nil,
 		FilePath:    "",
 		madeChanges: false,
+
+		DoLineBreak: false,
+		TextStyle:   nil,
 	}
 	state.MenuBar = getMenuBar(state)
+
+	state.TextStyle = &state.Editor.TextStyle //Pega o ponteiro do estilo
 
 	state.Editor.OnChanged = func(s string) {
 		handleEditorChange(state)
