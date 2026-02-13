@@ -2,7 +2,9 @@ package main
 
 import (
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/widget"
 )
 
 func baseFunc(state *AppState) func() {
@@ -118,6 +120,57 @@ func getLineBreakItemFunc(state *AppState) func() {
 	}
 }
 
+func getFontItemFunc(state *AppState) func() {
+	return func() {
+		fontCardContent := newScrolbarSelection()
+		fontCard := widget.NewCard("Fonte", "", fontCardContent)
+
+		//Bold
+		//Italic
+		//Monospace
+		//!symbol
+		//!Tabwidth
+		//!Underline
+		exampleLabel := widget.NewLabel("Exemplo")
+		boldCheck := widget.NewCheck("Negrito", func(b bool) {
+			state.TextStyle.Bold = b
+			state.Editor.Refresh()
+			exampleLabel.TextStyle = *state.TextStyle
+			exampleLabel.Refresh()
+		})
+		italicCheck := widget.NewCheck("Italico", func(b bool) {
+			state.TextStyle.Italic = b
+			state.Editor.Refresh()
+			exampleLabel.TextStyle = *state.TextStyle
+			exampleLabel.Refresh()
+		})
+		monospaceCheck := widget.NewCheck("Mono-espaçado", func(b bool) {
+			state.TextStyle.Monospace = b
+			state.Editor.Refresh()
+			exampleLabel.TextStyle = *state.TextStyle
+			exampleLabel.Refresh()
+		})
+
+		boldCheck.Checked = state.TextStyle.Bold
+		italicCheck.Checked = state.TextStyle.Italic
+		monospaceCheck.Checked = state.TextStyle.Monospace
+		styleCardContent := container.NewScroll(
+			container.NewVBox(exampleLabel, boldCheck, italicCheck, monospaceCheck),
+		)
+
+		styleCard := widget.NewCard("Estilo da fonte", "", styleCardContent)
+
+		sizeCardContent := widget.NewMultiLineEntry()
+		sizeCard := widget.NewCard("Tamanho: ", "", sizeCardContent)
+
+		content := container.NewGridWithColumns(3, fontCard, styleCard, sizeCard)
+
+		diag := dialog.NewCustom("Fonte", "Fechar", content, state.Window)
+		diag.Resize(fyne.NewSize(800, 600))
+		diag.Show()
+	}
+}
+
 func getMenuBar(state *AppState) *fyne.MainMenu {
 
 	//Arquivo [0]
@@ -137,7 +190,7 @@ func getMenuBar(state *AppState) *fyne.MainMenu {
 	//lineBreakItem := fyne.NewMenuItemWithIcon("Quebra de Linha Automatica", theme.AccountIcon(), getLineBreakItemFunc(state))
 	lineBreakItem := fyne.NewMenuItem("Quebra de Linha Automatica", getLineBreakItemFunc(state))
 	lineBreakItem.Icon = getEmptyIcon()
-	fontItem := fyne.NewMenuItem("Fonte", baseFunc(state))
+	fontItem := fyne.NewMenuItem("Fonte", getFontItemFunc(state))
 	formatMenu := fyne.NewMenu("Formatar", lineBreakItem, fontItem)
 
 	//Exibir [3]
