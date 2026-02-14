@@ -3,6 +3,8 @@ package main
 import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/theme"
 )
 
 func main() {
@@ -11,7 +13,9 @@ func main() {
 
 	state := NewAppState(a, w)
 
-	w.SetContent(state.Editor)
+	editorTheme := &EditorTheme{Theme: theme.DefaultTheme(), State: state}
+
+	w.SetContent(container.NewThemeOverride(state.Editor, editorTheme))
 	w.SetMainMenu(state.MenuBar)
 	w.Resize(fyne.NewSize(800, 600))
 	w.ShowAndRun()

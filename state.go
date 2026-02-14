@@ -5,6 +5,7 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -16,6 +17,9 @@ type AppState struct {
 
 	FilePath    string
 	madeChanges bool
+
+	fontSize     float32
+	fontResource fyne.Resource
 
 	DoLineBreak bool
 	TextStyle   *fyne.TextStyle
@@ -90,6 +94,9 @@ func NewAppState(a fyne.App, w fyne.Window) *AppState {
 
 		FilePath:    "",
 		madeChanges: false,
+
+		fontSize:     theme.DefaultTheme().Size(theme.SizeNameText),
+		fontResource: theme.DefaultTheme().Font(fyne.TextStyle{}),
 
 		DoLineBreak: false,
 		TextStyle:   nil,

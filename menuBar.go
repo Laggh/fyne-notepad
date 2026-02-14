@@ -122,44 +122,57 @@ func getLineBreakItemFunc(state *AppState) func() {
 
 func getFontItemFunc(state *AppState) func() {
 	return func() {
+		//fontCard
 		fontCardContent := newScrolbarSelection()
 		fontCard := widget.NewCard("Fonte", "", fontCardContent)
 
-		//Bold
-		//Italic
-		//Monospace
-		//!symbol
-		//!Tabwidth
-		//!Underline
-		exampleLabel := widget.NewLabel("Exemplo")
-		boldCheck := widget.NewCheck("Negrito", func(b bool) {
+		//styleCard
+		exampleEntry := widget.NewMultiLineEntry()
+		exampleEntry.Text = "Exemplo \n\tTab"
+		var boldCheck *widget.Check
+		var italicCheck *widget.Check
+		var monospaceCheck *widget.Check
+
+		refreshStyleCard := func() {
+			state.Editor.Refresh()
+			exampleEntry.TextStyle = *state.TextStyle
+			exampleEntry.Refresh()
+
+			if state.TextStyle.Monospace {
+				boldCheck.Disable()
+				italicCheck.Disable()
+			} else {
+				boldCheck.Enable()
+				italicCheck.Enable()
+			}
+
+		}
+		boldCheck = widget.NewCheck("Negrito", func(b bool) {
 			state.TextStyle.Bold = b
-			state.Editor.Refresh()
-			exampleLabel.TextStyle = *state.TextStyle
-			exampleLabel.Refresh()
+			refreshStyleCard()
 		})
-		italicCheck := widget.NewCheck("Italico", func(b bool) {
+		italicCheck = widget.NewCheck("Italico", func(b bool) {
 			state.TextStyle.Italic = b
-			state.Editor.Refresh()
-			exampleLabel.TextStyle = *state.TextStyle
-			exampleLabel.Refresh()
+			refreshStyleCard()
 		})
-		monospaceCheck := widget.NewCheck("Mono-espaçado", func(b bool) {
+		monospaceCheck = widget.NewCheck("Mono-espaçado", func(b bool) {
 			state.TextStyle.Monospace = b
-			state.Editor.Refresh()
-			exampleLabel.TextStyle = *state.TextStyle
-			exampleLabel.Refresh()
+			refreshStyleCard()
 		})
 
 		boldCheck.Checked = state.TextStyle.Bold
 		italicCheck.Checked = state.TextStyle.Italic
 		monospaceCheck.Checked = state.TextStyle.Monospace
-		styleCardContent := container.NewScroll(
-			container.NewVBox(exampleLabel, boldCheck, italicCheck, monospaceCheck),
+		refreshStyleCard()
+		styleCardContent := container.NewVSplit(
+			exampleEntry,
+			container.NewVBox(boldCheck, italicCheck, monospaceCheck),
 		)
+		styleCardContent.Offset = 0.2
 
 		styleCard := widget.NewCard("Estilo da fonte", "", styleCardContent)
 
+		//sizeCard
 		sizeCardContent := widget.NewMultiLineEntry()
 		sizeCard := widget.NewCard("Tamanho: ", "", sizeCardContent)
 
