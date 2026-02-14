@@ -96,7 +96,7 @@ func NewAppState(a fyne.App, w fyne.Window) *AppState {
 		madeChanges: false,
 
 		fontSize:     theme.DefaultTheme().Size(theme.SizeNameText),
-		fontResource: theme.DefaultTheme().Font(fyne.TextStyle{}),
+		fontResource: nil,
 
 		DoLineBreak: false,
 		TextStyle:   nil,
