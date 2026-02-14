@@ -1,6 +1,8 @@
 package main
 
 import (
+	"strconv"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
@@ -122,21 +124,20 @@ func getLineBreakItemFunc(state *AppState) func() {
 
 func getFontItemFunc(state *AppState) func() {
 	return func() {
+		exampleLabel := widget.NewLabel("AaBbYyZz")
+		exampleLabelContainer := container.NewThemeOverride(exampleLabel, state.Editor.Theme())
+
 		//fontCard
-		fontCardContent := newScrolbarSelection()
+		fontCardContent := container.NewCenter(widget.NewLabel("Em breve..."))
 		fontCard := widget.NewCard("Fonte", "", fontCardContent)
 
 		//styleCard
-		exampleEntry := widget.NewMultiLineEntry()
-		exampleEntry.Text = "Exemplo \n\tTab"
 		var boldCheck *widget.Check
 		var italicCheck *widget.Check
 		var monospaceCheck *widget.Check
 
-		refreshStyleCard := func() {
+		refresh := func() {
 			state.Editor.Refresh()
-			exampleEntry.TextStyle = *state.TextStyle
-			exampleEntry.Refresh()
 
 			if state.TextStyle.Monospace {
 				boldCheck.Disable()
@@ -146,37 +147,62 @@ func getFontItemFunc(state *AppState) func() {
 				italicCheck.Enable()
 			}
 
+			exampleLabel.TextStyle = *state.TextStyle
+			exampleLabel.Refresh()
+
 		}
 		boldCheck = widget.NewCheck("Negrito", func(b bool) {
 			state.TextStyle.Bold = b
-			refreshStyleCard()
+			refresh()
 		})
 		italicCheck = widget.NewCheck("Italico", func(b bool) {
 			state.TextStyle.Italic = b
-			refreshStyleCard()
+			refresh()
 		})
 		monospaceCheck = widget.NewCheck("Mono-espaçado", func(b bool) {
 			state.TextStyle.Monospace = b
-			refreshStyleCard()
+			refresh()
 		})
 
 		boldCheck.Checked = state.TextStyle.Bold
 		italicCheck.Checked = state.TextStyle.Italic
 		monospaceCheck.Checked = state.TextStyle.Monospace
-		refreshStyleCard()
-		styleCardContent := container.NewVSplit(
-			exampleEntry,
-			container.NewVBox(boldCheck, italicCheck, monospaceCheck),
-		)
-		styleCardContent.Offset = 0.2
+		refresh()
+		styleCardContent := container.NewVBox(boldCheck, italicCheck, monospaceCheck)
 
 		styleCard := widget.NewCard("Estilo da fonte", "", styleCardContent)
 
 		//sizeCard
-		sizeCardContent := widget.NewMultiLineEntry()
-		sizeCard := widget.NewCard("Tamanho: ", "", sizeCardContent)
+		sizesStr := []string{"8", "9", "10", "11", "12", "14", "16", "18", "20", "22", "24", "26", "28", "36", "48", "72"}
+		sizeCardContent := widget.NewSelectEntry(
+			sizesStr,
+		)
+		sizeCardContent.OnChanged = func(s string) {
+			size, err := strconv.ParseFloat(s, 64)
+			if err != nil {
+				return
+			}
+			if size > 200 {
+				size = 200
+			}
+			if size < 1 {
+				size = 1
+			}
 
-		content := container.NewGridWithColumns(3, fontCard, styleCard, sizeCard)
+			state.fontSize = float32(size)
+			refresh()
+		}
+		sizeCardContent.SetText(strconv.Itoa(int(state.fontSize)))
+
+		sizeCard := widget.NewCard("Tamanho", "", container.NewVBox(sizeCardContent))
+
+		topControls := container.NewVBox(
+			container.NewGridWithColumns(3, fontCard, styleCard, sizeCard),
+			widget.NewSeparator(),
+		)
+		exampleCard := widget.NewCard("Exemplo", "", container.NewCenter(exampleLabelContainer))
+
+		content := container.NewBorder(topControls, nil, nil, nil, exampleCard)
 
 		diag := dialog.NewCustom("Fonte", "Fechar", content, state.Window)
 		diag.Resize(fyne.NewSize(800, 600))
