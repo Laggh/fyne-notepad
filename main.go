@@ -15,10 +15,16 @@ func main() {
 
 	editorTheme := &EditorTheme{Theme: theme.DefaultTheme(), State: state}
 
+	content := container.NewBorder(
+		nil,
+		getBottomBar(state), //baixo
+		nil,
+		nil,
+		container.New(&sizeLimiterLayout{}, container.NewThemeOverride(state.Editor, editorTheme)), //meio
+	)
 	// container.New com sizeLimiterLayout "mente" o tamanho mínimo,
 	// impedindo a janela de explodir, mas entrega todo o espaço pro editor.
-	w.SetContent(container.New(&sizeLimiterLayout{},
-		container.NewThemeOverride(state.Editor, editorTheme)))
+	w.SetContent(content)
 
 	w.SetMainMenu(state.MenuBar)
 	w.Resize(fyne.NewSize(800, 600))
