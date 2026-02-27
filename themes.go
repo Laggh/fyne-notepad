@@ -12,8 +12,9 @@ type EditorTheme struct {
 
 func (t *EditorTheme) Size(name fyne.ThemeSizeName) float32 {
 	if name == theme.SizeNameText {
-		return t.State.fontSize
+		return t.State.fontSize * t.State.zoom
 	}
+
 	return t.Theme.Size(name)
 }
 

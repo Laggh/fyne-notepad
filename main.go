@@ -34,7 +34,6 @@ func (l *sizeLimiterLayout) Layout(objects []fyne.CanvasObject, size fyne.Size) 
 		o.Move(fyne.NewPos(0, 0))
 	}
 }
-
 func (l *sizeLimiterLayout) MinSize(objects []fyne.CanvasObject) fyne.Size {
 	return fyne.NewSize(100, 100)
 }

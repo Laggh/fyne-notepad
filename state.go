@@ -18,6 +18,7 @@ type AppState struct {
 	FilePath    string
 	madeChanges bool
 
+	zoom         float32
 	fontSize     float32
 	fontResource fyne.Resource
 
@@ -95,6 +96,7 @@ func NewAppState(a fyne.App, w fyne.Window) *AppState {
 		FilePath:    "",
 		madeChanges: false,
 
+		zoom:         1.0,
 		fontSize:     theme.DefaultTheme().Size(theme.SizeNameText),
 		fontResource: nil,
 

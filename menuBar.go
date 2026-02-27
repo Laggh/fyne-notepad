@@ -234,6 +234,11 @@ func getMenuBar(state *AppState) *fyne.MainMenu {
 
 	//Exibir [3]
 	zoomItem := fyne.NewMenuItem("Zoom", baseFunc(state))
+	zoomPlusItem := fyne.NewMenuItem("Ampliar", baseFunc(state))
+	zoomMinusItem := fyne.NewMenuItem("Reduzir", baseFunc(state))
+	zoomDefaultItem := fyne.NewMenuItem("Restaurar Zoom Padrão", baseFunc(state))
+	zoomItem.ChildMenu = fyne.NewMenu("", zoomPlusItem, zoomMinusItem, zoomDefaultItem)
+
 	statusBarItem := fyne.NewMenuItem("Barra de Status", baseFunc(state))
 	displayMenu := fyne.NewMenu("Exibir", zoomItem, statusBarItem)
 
