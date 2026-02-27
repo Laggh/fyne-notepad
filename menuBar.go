@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"os/exec"
 	"strconv"
 
 	"fyne.io/fyne/v2"
@@ -38,6 +40,24 @@ func getNewItemFunc(state *AppState) func() {
 			_f(true)
 		}
 
+	}
+}
+
+func getNewWindowItemFunc(state *AppState) func() {
+	return func() {
+		//Pega o novo executavel
+		executable, err := os.Executable()
+		if err != nil {
+			dialog.ShowError(err, state.Window)
+			return
+		}
+
+		//Reroda ele
+		cmd := exec.Command(executable)
+		err = cmd.Start()
+		if err != nil {
+			dialog.ShowError(err, state.Window)
+		}
 	}
 }
 
@@ -258,7 +278,7 @@ func getMenuBar(state *AppState) *fyne.MainMenu {
 	//Arquivo [0]
 	newItem := fyne.NewMenuItem("Novo", getNewItemFunc(state))
 	//TODO(): fazer janela novo funfar
-	newWindowItem := fyne.NewMenuItem("*Nova Janela", baseFunc(state))
+	newWindowItem := fyne.NewMenuItem("Nova Janela", getNewWindowItemFunc(state))
 	openItem := fyne.NewMenuItem("Abrir...", getOpenItemFunc(state))
 	saveItem := fyne.NewMenuItem("Salvar", getSaveItemFunc(state))
 	saveAsItem := fyne.NewMenuItem("Salvar Como", getSaveAsItemFunc(state))
