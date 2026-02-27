@@ -124,8 +124,11 @@ func getLineBreakItemFunc(state *AppState) func() {
 
 func getFontItemFunc(state *AppState) func() {
 	return func() {
+		//Precreating Vars
 		exampleLabel := widget.NewLabel("AaBbYyZz")
 		exampleLabelContainer := container.NewThemeOverride(exampleLabel, state.Editor.Theme())
+
+		zoomLabel := widget.NewLabel("Zoom: Indefinido")
 
 		//fontCard
 		fontCardContent := container.NewCenter(widget.NewLabel("Em breve..."))
@@ -150,6 +153,8 @@ func getFontItemFunc(state *AppState) func() {
 			exampleLabel.TextStyle = *state.TextStyle
 			exampleLabel.Refresh()
 
+			zoomLabel.SetText("Zoom: " + strconv.Itoa(int(state.zoom*100)) + "%")
+			zoomLabel.Refresh()
 		}
 		boldCheck = widget.NewCheck("Negrito", func(b bool) {
 			state.TextStyle.Bold = b
@@ -174,10 +179,19 @@ func getFontItemFunc(state *AppState) func() {
 
 		//sizeCard
 		sizesStr := []string{"8", "9", "10", "11", "12", "14", "16", "18", "20", "22", "24", "26", "28", "36", "48", "72"}
-		sizeCardContent := widget.NewSelectEntry(
-			sizesStr,
-		)
-		sizeCardContent.OnChanged = func(s string) {
+		sizeEntry := widget.NewSelectEntry(sizesStr)
+		//zoomLabel = widget.NewLabel("Zoom: 100%")
+		zoomSlider := widget.NewSlider(0.1, 5)
+		zoomSlider.Step = 0.1
+
+		sizeCardContent :=
+			container.NewVBox(
+				sizeEntry,
+				zoomLabel,
+				zoomSlider,
+			)
+
+		sizeEntry.OnChanged = func(s string) {
 			size, err := strconv.ParseFloat(s, 64)
 			if err != nil {
 				return
@@ -192,7 +206,13 @@ func getFontItemFunc(state *AppState) func() {
 			state.fontSize = float32(size)
 			refresh()
 		}
-		sizeCardContent.SetText(strconv.Itoa(int(state.fontSize)))
+		sizeEntry.SetText(strconv.Itoa(int(state.fontSize)))
+
+		zoomSlider.OnChangeEnded = func(f float64) {
+			state.zoom = float32(f)
+			refresh()
+		}
+		zoomSlider.Value = float64(state.zoom)
 
 		sizeCard := widget.NewCard("Tamanho", "", container.NewVBox(sizeCardContent))
 
@@ -210,6 +230,29 @@ func getFontItemFunc(state *AppState) func() {
 	}
 }
 
+// Exibir
+func getZoomPlusItemFunc(state *AppState) func() {
+	return func() {
+		state.zoom += 0.1
+		state.Editor.Refresh()
+	}
+}
+
+func getZoomMinusItemFunc(state *AppState) func() {
+	return func() {
+		state.zoom -= 0.1
+		state.Editor.Refresh()
+	}
+}
+
+func getZoomDefaultItemFunc(state *AppState) func() {
+	return func() {
+		state.zoom = 1
+		state.Editor.Refresh()
+	}
+}
+
+// getMenuBar
 func getMenuBar(state *AppState) *fyne.MainMenu {
 
 	//Arquivo [0]
@@ -234,9 +277,9 @@ func getMenuBar(state *AppState) *fyne.MainMenu {
 
 	//Exibir [3]
 	zoomItem := fyne.NewMenuItem("Zoom", baseFunc(state))
-	zoomPlusItem := fyne.NewMenuItem("Ampliar", baseFunc(state))
-	zoomMinusItem := fyne.NewMenuItem("Reduzir", baseFunc(state))
-	zoomDefaultItem := fyne.NewMenuItem("Restaurar Zoom Padrão", baseFunc(state))
+	zoomPlusItem := fyne.NewMenuItem("Ampliar", getZoomPlusItemFunc(state))
+	zoomMinusItem := fyne.NewMenuItem("Reduzir", getZoomMinusItemFunc(state))
+	zoomDefaultItem := fyne.NewMenuItem("Restaurar Zoom Padrão", getZoomDefaultItemFunc(state))
 	zoomItem.ChildMenu = fyne.NewMenu("", zoomPlusItem, zoomMinusItem, zoomDefaultItem)
 
 	statusBarItem := fyne.NewMenuItem("Barra de Status", baseFunc(state))
